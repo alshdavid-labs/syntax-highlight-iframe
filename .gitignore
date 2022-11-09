@@ -1,10 +1,8 @@
 node_modules
-dist
 
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
 # builds
-dist/
 build/
 publish/
 
@@ -14,8 +12,6 @@ node_modules/
 # reports
 /packages/**/reports/**
 
-# dist
-/dist
 
 # editors
 .idea
@@ -28,9 +24,6 @@ lerna-debug.log*
 
 # JUnit test results
 junit.xml
-
-# Build artifacts
-/dist
 
 # Bamboo Agent Files
 **/.electron/*
