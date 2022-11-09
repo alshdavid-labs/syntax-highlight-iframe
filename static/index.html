@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="prism-dark.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="prism-light.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="line-numbers.css">
+  <script src="./prism.js"></script>
+  <title>Syntax Highlight Iframe</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    pre[class*=language-] {
+      margin: 0;
+    }
+  </style>
+</head>
+<body class="line-numbers">
+<pre><code></code></pre>
+<script>
+  let frameIdentifier = undefined
+
+  function sendHeight() {
+    if (frameIdentifier === undefined) return
+    const height_number = window.document.body.getBoundingClientRect().height
+    const msg = { 
+      action: 'RESIZE',
+      identifier: frameIdentifier,
+      height: `${height_number}px`,
+      height_number,
+    }
+    window.parent.postMessage(msg, '*')
+  }
+
+  new window.ResizeObserver(sendHeight).observe(window.document.body)
+
+  window.addEventListener('message', (ev) => {
+    if (ev.data.action !== 'CONFIG') {
+      return
+    }
+
+    const { code, language, identifier } = ev.data
+
+    frameIdentifier = identifier 
+
+    const codeEl = document.querySelector('code')
+    codeEl.innerHTML = code
+    codeEl.classList.add(`language-${language}`)
+    Prism.highlightElement(codeEl, false, sendHeight)
+  })
+</script>
+</body>
+</html>
