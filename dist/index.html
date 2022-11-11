@@ -74,6 +74,15 @@
       config.theme = data.theme
     }
 
+    if (!config.theme) {
+      const systemPreffered = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'prism-dark' : 'prism-light'
+      config.linkElement = document.createElement('link')
+      config.linkElement.rel = "stylesheet"
+      config.linkElement.href = `themes/${systemPreffered}.css`
+      document.head.appendChild(config.linkElement)
+      config.theme = data.theme
+    }
+
     if (data.code && data.code !== config.code) {
       codeElement.innerHTML = data.code
       config.code = data.code
