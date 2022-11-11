@@ -95,11 +95,11 @@ pre[class*="language-"] {
 }
 
 .token.class-name {
-	color: #f2ff00;
+	color: #c3e88d;
 }
 
 .token.color {
-	color: #f2ff00;
+	color: #c3e88d;
 }
 
 .token.comment {
@@ -127,7 +127,7 @@ pre[class*="language-"] {
 }
 
 .token.hexcode {
-	color: #f2ff00;
+	color: #c3e88d;
 }
 
 .token.id {
@@ -178,7 +178,7 @@ pre[class*="language-"] {
 }
 
 .token.regex {
-	color: #f2ff00;
+	color: #c3e88d;
 }
 
 .token.selector {

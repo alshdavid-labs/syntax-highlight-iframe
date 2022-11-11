@@ -5,32 +5,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="prism-dark.css" media="(prefers-color-scheme: dark)">
-  <link rel="stylesheet" href="prism-light.css" media="(prefers-color-scheme: light)">
   <link rel="stylesheet" href="line-numbers.css">
   <script src="./prism.js"></script>
   <title>Syntax Highlight Iframe</title>
   <style>
     body {
       margin: 0;
+      overflow-y: hidden;
     }
 
-    pre[class*=language-] {
-      margin: 0;
+    pre {
+      margin: 0 !important;
     }
   </style>
 </head>
 <body class="line-numbers">
 <pre><code></code></pre>
 <script>
-  let frameIdentifier = undefined
+  let config = undefined
+  let codeElement = document.querySelector('code')
 
   function sendHeight() {
-    if (frameIdentifier === undefined) return
+    if (!config || config.identifier === undefined) return
     const height_number = window.document.body.getBoundingClientRect().height
     const msg = { 
       action: 'RESIZE',
-      identifier: frameIdentifier,
+      identifier: config.identifier,
       height: `${height_number}px`,
       height_number,
     }
@@ -39,19 +39,52 @@
 
   new window.ResizeObserver(sendHeight).observe(window.document.body)
 
-  window.addEventListener('message', (ev) => {
-    if (ev.data.action !== 'CONFIG') {
+  window.addEventListener('message', ({ data }) => {
+    if (!data || (data && data.action !== 'CONFIG')) {
       return
     }
 
-    const { code, language, identifier } = ev.data
+    if (config && config.identifier && data.identifier && config.identifier !== data.identifier) {
+      throw new Error('Cannot change identifier')
+    }
 
-    frameIdentifier = identifier 
+    if (config && typeof config.identifier === 'undefined' && typeof data.identifier === 'undefined') {
+      throw new Error('Must set an identifier')
+    }
 
-    const codeEl = document.querySelector('code')
-    codeEl.innerHTML = code
-    codeEl.classList.add(`language-${language}`)
-    Prism.highlightElement(codeEl, false, sendHeight)
+    if (config && typeof config.identifier === 'undefined' && typeof data.identifier !== 'string') {
+      throw new Error('Identifier must be a string value')
+    }
+
+    let renderPrism = false
+    config = { ...(config || {}) }
+
+    if (!config.identifier && data.identifier) {
+      config.identifier = data.identifier
+    }
+
+    if (data.theme && data.theme !== config.theme) {
+      if (config.linkElement) {
+        document.head.removeChild(config.linkElement)
+      }
+      config.linkElement = document.createElement('link')
+      config.linkElement.rel = "stylesheet" 
+      config.linkElement.href = `themes/${data.theme}.css`
+      document.head.appendChild(config.linkElement)
+      config.theme = data.theme
+    }
+
+    if (data.code && data.code !== config.code) {
+      codeElement.innerHTML = data.code
+      config.code = data.code
+    }
+
+    if (data.language && data.language !== config.language) {
+      codeElement.className = `language-${data.language}`
+      config.language = data.language
+    }
+
+    Prism.highlightElement(codeElement, false, sendHeight)
   })
 </script>
 </body>
